@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import { getOffset, getPositionStyle } from '../util';
 import SliderContext from '../context';
@@ -19,7 +19,7 @@ export default function Mark({
   activeClassName,
 }: MarkProps) {
   const { min, max, direction, includedStart, includedEnd, included } =
-    React.useContext(SliderContext);
+    useContext(SliderContext);
 
   const positionStyle = getPositionStyle(direction, getOffset(value, min, max));
   const active = included && includedStart <= value && value <= includedEnd;

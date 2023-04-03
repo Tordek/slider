@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import clsx from 'clsx';
 import warning from 'tiny-warning';
 import shallowEqual from 'shallowequal';
@@ -236,8 +236,8 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     },
     ref
   ) => {
-    const handlesRef = React.useRef<HandlesRef>(null);
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const handlesRef = useRef<HandlesRef>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const direction = vertical
       ? reverse
         ? 'ttb'
@@ -247,7 +247,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
       : 'ltr';
 
     const boundedMin = isFinite(min) ? min : 0;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         isFinite(min),
         `Invalid \`min\` value: ${min}. It must be a finite number.`
@@ -255,7 +255,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     }, [min]);
 
     const boundedMax = isFinite(max) ? max : 100;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         isFinite(max),
         `Invalid \`max\` value: ${max}. It must be a finite number.`
@@ -264,7 +264,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
 
     // ============================= Step =============================
     const normalizedStep = step === null || step > 0 ? step : 1;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         !(step && step < 0),
         `Invalid \`step\` value: ${
@@ -273,7 +273,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
       );
     }, [step]);
 
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         readOnly || onChange !== undefined,
         'You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. Set either `onChange` or `readOnly`.'
@@ -289,7 +289,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
         : false;
 
     // ============================ Marks =============================
-    const markList = React.useMemo<InternalMarkObj[]>(() => {
+    const markList = useMemo<InternalMarkObj[]>(() => {
       return Object.entries(marks ?? {})
         .map(([key, mark]) => ({
           value: Number(key),
@@ -310,7 +310,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     );
 
     // ============================ Values ============================
-    const rawValues = React.useMemo(() => {
+    const rawValues = useMemo(() => {
       const valueList = value ?? [];
 
       const [val0 = boundedMin] = valueList;
@@ -434,7 +434,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
 
     // ============================= Drag =============================
     const mergedDraggableTrack = draggableTrack && normalizedStep !== null;
-    React.useEffect(() => {
+    useEffect(() => {
       if (draggableTrack && normalizedStep === null) {
         console.warn(
           '`draggableTrack` is not supported when `step` is `null`.'
@@ -455,14 +455,14 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     });
 
     // =========================== Included ===========================
-    const sortedCacheValues = React.useMemo(
+    const sortedCacheValues = useMemo(
       () => [...rawValues].sort((a, b) => a - b),
       [rawValues]
     );
 
     // Provide a range values with included [min, max]
     // Used for Track, Mark & Dot
-    const [includedStart, includedEnd] = React.useMemo(() => {
+    const [includedStart, includedEnd] = useMemo(() => {
       if (!range) {
         return [boundedMin, sortedCacheValues[0]];
       }
@@ -474,7 +474,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     }, [sortedCacheValues, range, boundedMin]);
 
     // ============================= Refs =============================
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       focus: () => {
         handlesRef.current?.focus(0);
       },
@@ -487,7 +487,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
     }));
 
     // ========================== Auto Focus ==========================
-    React.useEffect(() => {
+    useEffect(() => {
       if (autoFocus) {
         handlesRef.current?.focus(0);
       }

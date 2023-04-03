@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import Handle from './Handle';
 import { HandleProps } from './Handle';
 import { getIndex } from '../util';
@@ -22,9 +22,9 @@ export interface HandlesRef {
 
 const Handles = React.forwardRef<HandlesRef, HandlesProps>(
   ({ handleClassName, values, draggingIndex, ...restProps }, ref) => {
-    const handlesRef = React.useRef<Record<number, HTMLDivElement>>({});
+    const handlesRef = useRef<Record<number, HTMLDivElement>>({});
 
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       focus: (index: number) => {
         handlesRef.current[index]?.focus();
       },

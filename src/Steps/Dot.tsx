@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import { getOffset, getPositionStyle } from '../util';
 import SliderContext from '../context';
@@ -11,7 +11,7 @@ export interface DotProps {
 
 export default function Dot({ value, className, activeClassName }: DotProps) {
   const { min, max, direction, included, includedStart, includedEnd } =
-    React.useContext(SliderContext);
+    useContext(SliderContext);
 
   const active = included && includedStart <= value && value <= includedEnd;
 

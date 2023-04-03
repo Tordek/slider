@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import SliderContext from '../context';
 import { getOffset } from '../util';
 import { OnStartMove } from '../interface';
@@ -16,7 +16,7 @@ export default function Track({
   end,
   onStartMove,
 }: TrackProps) {
-  const { direction, min, max, disabled } = React.useContext(SliderContext);
+  const { direction, min, max, disabled } = useContext(SliderContext);
 
   const offsetStart = getOffset(start, min, max);
   const offsetEnd = getOffset(end, min, max);

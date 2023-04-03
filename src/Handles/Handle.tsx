@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import SliderContext from '../context';
 import { getPositionStyle, getIndex, getOffset } from '../util';
@@ -50,7 +50,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
       ariaLabelForHandle,
       ariaLabelledByForHandle,
       ariaValueTextFormatterForHandle,
-    } = React.useContext(SliderContext);
+    } = useContext(SliderContext);
 
     // ============================ Events ============================
     const onInternalStartMove = (e: React.MouseEvent | React.TouchEvent) => {
@@ -114,7 +114,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
     );
 
     // ============================ Render ============================
-    let handleNode = (
+    const handleNode = (
       <div
         ref={ref}
         className={clsx(className, dragging && draggingClassName)}
@@ -142,7 +142,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
 
     // Customize
     if (handleRenderer) {
-      handleNode = handleRenderer(handleNode, {
+      return handleRenderer(handleNode, {
         index: valueIndex,
         value,
         dragging,

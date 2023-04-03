@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import { InternalMarkObj } from '../Marks';
 import SliderContext from '../context';
 import Dot from './Dot';
@@ -18,9 +18,9 @@ export default function Steps({
   dotClassName,
   activeClassName,
 }: StepsProps) {
-  const { min, max, step } = React.useContext(SliderContext);
+  const { min, max, step } = useContext(SliderContext);
 
-  const stepDots = React.useMemo(() => {
+  const stepDots = useMemo(() => {
     const dotSet = new Set<number>();
 
     // Add marks

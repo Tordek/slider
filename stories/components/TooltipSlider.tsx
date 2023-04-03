@@ -19,8 +19,8 @@ const HandleTooltip = ({
   tipFormatter = (val) => `${val} %`,
   ...restProps
 }: TooltipSliderProps) => {
-  const tooltipRef = React.useRef<any>();
-  const rafRef = React.useRef<number | null>(null);
+  const tooltipRef = useRef<any>();
+  const rafRef = useRef<number | null>(null);
 
   function cancelKeepAlign() {
     raf.cancel(rafRef.current!);
@@ -33,7 +33,7 @@ const HandleTooltip = ({
     });
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (visible) {
       keepAlign();
     } else {

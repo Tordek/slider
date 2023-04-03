@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { HandlesRef } from '../Handles';
 import { Direction, OnStartMove } from '../interface';
 import { ConstrainValue, OffsetValues } from './useOffset';
@@ -35,25 +35,25 @@ const useDrag = ({
   draggingIndex: number;
   onStartDrag: OnStartMove;
 } => {
-  const [draggingIndex, setDraggingIndex] = React.useState(-1);
-  const [cacheValues, setCacheValues] = React.useState(rawValues);
-  const [originValues, setOriginValues] = React.useState(rawValues);
+  const [draggingIndex, setDraggingIndex] = useState(-1);
+  const [cacheValues, setCacheValues] = useState(rawValues);
+  const [originValues, setOriginValues] = useState(rawValues);
 
-  const mouseMoveEventRef = React.useRef<
+  const mouseMoveEventRef = useRef<
     null | ((event: MouseEvent | TouchEvent) => void)
   >(null);
-  const mouseUpEventRef = React.useRef<
+  const mouseUpEventRef = useRef<
     null | ((event: MouseEvent | TouchEvent) => void)
   >(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (draggingIndex === -1) {
       setCacheValues(rawValues);
     }
   }, [rawValues, draggingIndex]);
 
   // Clean up event
-  React.useEffect(
+  useEffect(
     () => () => {
       if (mouseMoveEventRef.current)
         document.removeEventListener('mousemove', mouseMoveEventRef.current);
@@ -110,7 +110,7 @@ const useDrag = ({
   };
 
   // Resolve closure
-  const updateCacheValueRef = React.useRef(updateCacheValue);
+  const updateCacheValueRef = useRef(updateCacheValue);
   updateCacheValueRef.current = updateCacheValue;
 
   const onStartDrag: OnStartMove = (e, valueIndex) => {

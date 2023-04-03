@@ -449,7 +449,7 @@ describe('Range', () => {
         const onChange = jest.fn();
 
         const Demo = () => {
-          const [, setValue] = React.useState<number | number[]>([20, 40]);
+          const [, setValue] = useState<number | number[]>([20, 40]);
 
           return (
             <Range
