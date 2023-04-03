@@ -613,7 +613,6 @@ describe('Slider', () => {
     expect(container.querySelector('.custom-handle')).toBeTruthy();
   });
 
-  // FIXME
   it('max value not align with step', () => {
     const onChange = jest.fn();
 

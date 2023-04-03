@@ -94,7 +94,7 @@ describe('Range', () => {
       touches: [{}],
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    ((touchStart as TouchEvent).touches[0] as any).pageX = end;
+    ((touchMove as TouchEvent).touches[0] as any).pageX = end;
     fireEvent(document, touchMove);
   }
 
@@ -504,10 +504,8 @@ describe('Range', () => {
 
   test('mouse', (container: HTMLElement) =>
     doMouseMove(container, 0, 20, 'rc-slider-track'));
-  // FIXME
-  // test('touch', (container: HTMLElement) =>
-  //   doTouchMove(container, 0, 20, 'rc-slider-track'));
-  // });
+  test('touch', (container: HTMLElement) =>
+    doTouchMove(container, 0, 20, 'rc-slider-track'));
 
   it('sets aria-label on the handles', () => {
     const { container } = render(
