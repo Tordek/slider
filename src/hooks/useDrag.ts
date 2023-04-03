@@ -32,10 +32,10 @@ const useDrag = ({
   triggerChange: (values: number[]) => void;
   offsetValues: OffsetValues;
 }): {
-  draggingIndex: number;
+  draggingIndex: number | null;
   onStartDrag: OnStartMove;
 } => {
-  const [draggingIndex, setDraggingIndex] = useState(-1);
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [cacheValues, setCacheValues] = useState(rawValues);
   const [originValues, setOriginValues] = useState(rawValues);
 
@@ -47,7 +47,7 @@ const useDrag = ({
   >(null);
 
   useEffect(() => {
-    if (draggingIndex === -1) {
+    if (draggingIndex === null) {
       setCacheValues(rawValues);
     }
   }, [rawValues, draggingIndex]);
@@ -55,14 +55,14 @@ const useDrag = ({
   // Clean up event
   useEffect(
     () => () => {
-      if (mouseMoveEventRef.current)
+      if (mouseMoveEventRef.current) {
         document.removeEventListener('mousemove', mouseMoveEventRef.current);
-      if (mouseUpEventRef.current)
-        document.removeEventListener('mouseup', mouseUpEventRef.current);
-      if (mouseMoveEventRef.current)
         document.removeEventListener('touchmove', mouseMoveEventRef.current);
-      if (mouseUpEventRef.current)
+      }
+      if (mouseUpEventRef.current) {
+        document.removeEventListener('mouseup', mouseUpEventRef.current);
         document.removeEventListener('touchend', mouseUpEventRef.current);
+      }
     },
     []
   );
@@ -75,10 +75,13 @@ const useDrag = ({
     }
   };
 
-  const updateCacheValue = (valueIndex: number, offsetPercent: number) => {
+  const updateCacheValue = (
+    valueIndex: number | null,
+    offsetPercent: number
+  ) => {
     // Basic point offset
 
-    if (valueIndex === -1) {
+    if (valueIndex === null) {
       // >>>> Dragging on the track
       const startValue = originValues[0];
       const endValue = originValues[originValues.length - 1];
@@ -127,9 +130,9 @@ const useDrag = ({
       const onMouseMove = (event: MouseEvent | TouchEvent) => {
         event.preventDefault();
 
-        const { pageX: moveX, pageY: moveY } = getPosition(event);
-        const offsetX = moveX - startX;
-        const offsetY = moveY - startY;
+        const { pageX: endX, pageY: endY } = getPosition(event);
+        const offsetX = endX - startX;
+        const offsetY = endY - startY;
 
         if (!containerRef.current) return;
 
@@ -166,8 +169,10 @@ const useDrag = ({
         mouseMoveEventRef.current = null;
         mouseUpEventRef.current = null;
 
-        handlesRef.current?.focus(valueIndex);
-        setDraggingIndex(-1);
+        if (valueIndex !== null) {
+          handlesRef.current?.focus(valueIndex);
+        }
+        setDraggingIndex(null);
       };
 
       document.addEventListener('mouseup', onMouseUp);

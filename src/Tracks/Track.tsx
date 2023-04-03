@@ -24,7 +24,7 @@ export default function Track({
   // ============================ Events ============================
   const onInternalStartMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!disabled && onStartMove) {
-      onStartMove(e, -1);
+      onStartMove(e, null);
     }
   };
 

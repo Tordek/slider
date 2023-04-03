@@ -13,7 +13,7 @@ export interface HandlesProps {
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
   handleRenderer?: HandleProps['handleRenderer'];
-  draggingIndex: number;
+  draggingIndex: number | null;
 }
 
 export interface HandlesRef {
