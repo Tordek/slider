@@ -31,7 +31,7 @@ const Handles = React.forwardRef<HandlesRef, HandlesProps>(
     }));
 
     return (
-      <React.Fragment>
+      <>
         {values.map((value, index) => (
           <Handle
             ref={(node) => {
@@ -49,7 +49,7 @@ const Handles = React.forwardRef<HandlesRef, HandlesProps>(
             {...restProps}
           />
         ))}
-      </React.Fragment>
+      </>
     );
   }
 );
