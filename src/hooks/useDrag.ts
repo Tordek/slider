@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { HandlesRef } from '../Handles';
 import { Direction, OnStartMove } from '../interface';
 import { ConstrainValue, OffsetValues } from './useOffset';
@@ -113,69 +113,72 @@ const useDrag = ({
   const updateCacheValueRef = useRef(updateCacheValue);
   updateCacheValueRef.current = updateCacheValue;
 
-  const onStartDrag: OnStartMove = (e, valueIndex) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const onStartDrag: OnStartMove = useCallback(
+    (e, valueIndex) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    setDraggingIndex(valueIndex);
-    setOriginValues(rawValues);
+      setDraggingIndex(valueIndex);
+      setOriginValues(rawValues);
 
-    const { pageX: startX, pageY: startY } = getPosition(e);
+      const { pageX: startX, pageY: startY } = getPosition(e);
 
-    // Moving
-    const onMouseMove = (event: MouseEvent | TouchEvent) => {
-      event.preventDefault();
+      // Moving
+      const onMouseMove = (event: MouseEvent | TouchEvent) => {
+        event.preventDefault();
 
-      const { pageX: moveX, pageY: moveY } = getPosition(event);
-      const offsetX = moveX - startX;
-      const offsetY = moveY - startY;
+        const { pageX: moveX, pageY: moveY } = getPosition(event);
+        const offsetX = moveX - startX;
+        const offsetY = moveY - startY;
 
-      if (!containerRef.current) return;
+        if (!containerRef.current) return;
 
-      const { width, height } = containerRef.current.getBoundingClientRect();
+        const { width, height } = containerRef.current.getBoundingClientRect();
 
-      let offsetRatio: number;
-      switch (direction) {
-        case 'btt':
-          offsetRatio = -offsetY / height;
-          break;
+        let offsetRatio: number;
+        switch (direction) {
+          case 'btt':
+            offsetRatio = -offsetY / height;
+            break;
 
-        case 'ttb':
-          offsetRatio = offsetY / height;
-          break;
+          case 'ttb':
+            offsetRatio = offsetY / height;
+            break;
 
-        case 'rtl':
-          offsetRatio = -offsetX / width;
-          break;
+          case 'rtl':
+            offsetRatio = -offsetX / width;
+            break;
 
-        default:
-          offsetRatio = offsetX / width;
-      }
-      updateCacheValueRef.current(valueIndex, offsetRatio);
-    };
+          default:
+            offsetRatio = offsetX / width;
+        }
+        updateCacheValueRef.current(valueIndex, offsetRatio);
+      };
 
-    // End
-    const onMouseUp = (event: MouseEvent | TouchEvent) => {
-      event.preventDefault();
+      // End
+      const onMouseUp = (event: MouseEvent | TouchEvent) => {
+        event.preventDefault();
 
-      document.removeEventListener('mouseup', onMouseUp);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('touchend', onMouseUp);
-      document.removeEventListener('touchmove', onMouseMove);
-      mouseMoveEventRef.current = null;
-      mouseUpEventRef.current = null;
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('touchend', onMouseUp);
+        document.removeEventListener('touchmove', onMouseMove);
+        mouseMoveEventRef.current = null;
+        mouseUpEventRef.current = null;
 
-      handlesRef.current?.focus(valueIndex);
-      setDraggingIndex(-1);
-    };
+        handlesRef.current?.focus(valueIndex);
+        setDraggingIndex(-1);
+      };
 
-    document.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('touchend', onMouseUp);
-    document.addEventListener('touchmove', onMouseMove);
-    mouseMoveEventRef.current = onMouseMove;
-    mouseUpEventRef.current = onMouseUp;
-  };
+      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('touchend', onMouseUp);
+      document.addEventListener('touchmove', onMouseMove);
+      mouseMoveEventRef.current = onMouseMove;
+      mouseUpEventRef.current = onMouseUp;
+    },
+    [containerRef, direction, handlesRef, rawValues]
+  );
 
   return {
     draggingIndex,
