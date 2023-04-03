@@ -21,11 +21,6 @@ export default function Marks({
   marks,
   onClick,
 }: MarksProps) {
-  // Not render mark if empty
-  if (marks.length === 0) {
-    return null;
-  }
-
   return (
     <div className={className}>
       {marks.map(({ value, label }) => (

@@ -533,13 +533,14 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
             />
           )}
 
-          <Steps
-            marks={markList}
-            dots={dots}
-            className={stepsClassName}
-            dotClassName={dotClassName}
-            activeClassName={activeDotClassName}
-          />
+          {dots && (
+            <Steps
+              marks={markList}
+              className={stepsClassName}
+              dotClassName={dotClassName}
+              activeClassName={activeDotClassName}
+            />
+          )}
 
           <Handles
             ref={handlesRef}
@@ -554,13 +555,15 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
             handleRenderer={handleRender}
           />
 
-          <Marks
-            className={marksClassName}
-            markClassName={markTextClassName}
-            activeMarkClassName={activeMarkTextClassName}
-            marks={markList}
-            onClick={setClosestHandle}
-          />
+          {markList.length > 0 && (
+            <Marks
+              className={marksClassName}
+              markClassName={markTextClassName}
+              activeMarkClassName={activeMarkTextClassName}
+              marks={markList}
+              onClick={setClosestHandle}
+            />
+          )}
         </div>
       </SliderContext.Provider>
     );
