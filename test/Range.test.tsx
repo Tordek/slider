@@ -79,23 +79,14 @@ describe('Range', () => {
     end: number,
     element: string
   ) {
-    const touchStart = createEvent.touchStart(
-      container.getElementsByClassName(element)[0],
-      {
-        touches: [{}],
-      }
-    );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    ((touchStart as TouchEvent).touches[0] as any).pageX = start;
-    fireEvent(container.getElementsByClassName(element)[0], touchStart);
+    fireEvent.touchStart(container.getElementsByClassName(element)[0], {
+      touches: [{ pageX: start }],
+    });
 
     // Drag
-    const touchMove = createEvent.touchMove(document, {
-      touches: [{}],
+    fireEvent.touchMove(document, {
+      touches: [{ pageX: end }],
     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    ((touchMove as TouchEvent).touches[0] as any).pageX = end;
-    fireEvent(document, touchMove);
   }
 
   it('should render with correct DOM structure', () => {
