@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import 'rc-tooltip/assets/bootstrap.css';
 import type { RangeProps } from '../../src';
 import raf from 'rc-util/lib/raf';
