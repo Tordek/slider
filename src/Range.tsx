@@ -152,7 +152,7 @@ export interface RangeProps {
 
   // Components
   /** Custom renderer for handles */
-  handleRender?: HandlesProps['handleRender'];
+  handleRender?: HandlesProps['handleRenderer'];
 
   // Accessibility
   /** tabIndex for each handle. Set to `null` to disable. */
@@ -551,7 +551,7 @@ const Range = React.forwardRef<RangeRef, RangeProps>(
             onOffsetChange={onHandleOffsetChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            handleRender={handleRender}
+            handleRenderer={handleRender}
           />
 
           <Marks

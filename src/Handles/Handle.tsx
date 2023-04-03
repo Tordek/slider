@@ -20,7 +20,7 @@ export interface HandleProps {
   onOffsetChange: (offset: number | 'min' | 'max', valueIndex: number) => void;
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
-  render?: (
+  handleRenderer?: (
     origin: React.ReactElement<HandleProps>,
     props: RenderProps
   ) => React.ReactElement;
@@ -34,7 +34,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
       value,
       valueIndex,
       onStartMove,
-      render,
+      handleRenderer,
       dragging,
       onOffsetChange,
       ...restProps
@@ -141,8 +141,8 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
     );
 
     // Customize
-    if (render) {
-      handleNode = render(handleNode, {
+    if (handleRenderer) {
+      handleNode = handleRenderer(handleNode, {
         index: valueIndex,
         value,
         dragging,

@@ -12,7 +12,7 @@ export interface HandlesProps {
   onOffsetChange: (value: number | 'min' | 'max', valueIndex: number) => void;
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
-  handleRender?: HandleProps['render'];
+  handleRenderer?: HandleProps['handleRenderer'];
   draggingIndex: number;
 }
 
@@ -21,19 +21,7 @@ export interface HandlesRef {
 }
 
 const Handles = React.forwardRef<HandlesRef, HandlesProps>(
-  (
-    {
-      handleClassName,
-      draggingClassName,
-      onStartMove,
-      onOffsetChange,
-      values,
-      handleRender,
-      draggingIndex,
-      ...restProps
-    },
-    ref
-  ) => {
+  ({ handleClassName, values, draggingIndex, ...restProps }, ref) => {
     const handlesRef = React.useRef<Record<number, HTMLDivElement>>({});
 
     React.useImperativeHandle(ref, () => ({
@@ -55,13 +43,9 @@ const Handles = React.forwardRef<HandlesRef, HandlesProps>(
             }}
             dragging={draggingIndex === index}
             className={getIndex(handleClassName, index)}
-            draggingClassName={draggingClassName}
             key={`${index}+${value}`}
             value={value}
             valueIndex={index}
-            onStartMove={onStartMove}
-            onOffsetChange={onOffsetChange}
-            render={handleRender}
             {...restProps}
           />
         ))}
