@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import { InternalMarkObj } from '../Marks';
 import SliderContext from '../context';
 import Dot from './Dot';
 
 export interface StepsProps {
   marks: InternalMarkObj[];
-  dots?: boolean;
   className?: string;
   dotClassName?: string;
   activeClassName?: string;
@@ -13,14 +12,13 @@ export interface StepsProps {
 
 export default function Steps({
   marks,
-  dots,
   className,
   dotClassName,
   activeClassName,
 }: StepsProps) {
-  const { min, max, step } = React.useContext(SliderContext);
+  const { min, max, step } = useContext(SliderContext);
 
-  const stepDots = React.useMemo(() => {
+  const stepDots = useMemo(() => {
     const dotSet = new Set<number>();
 
     // Add marks
@@ -29,16 +27,14 @@ export default function Steps({
     });
 
     // Fill dots
-    if (dots && step !== null) {
-      let current = min;
-      while (current <= max) {
+    if (step !== null) {
+      for (let current = min; current <= max; current += step) {
         dotSet.add(current);
-        current += step;
       }
     }
 
     return Array.from(dotSet);
-  }, [min, max, step, dots, marks]);
+  }, [min, max, step, marks]);
 
   return (
     <div className={className}>

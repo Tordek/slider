@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import type { RangeProps, RangeRef } from './Range';
 import Range from './Range';
 
@@ -7,7 +7,6 @@ export type SliderProps = Omit<
   | 'value'
   | 'range'
   | 'count'
-  | 'defaultValue'
   | 'onChange'
   | 'draggableTrack'
   | 'allowCross'
@@ -16,8 +15,7 @@ export type SliderProps = Omit<
   | 'handleClassName'
   | 'tabIndex'
 > & {
-  value?: number | null;
-  defaultValue?: number;
+  value: number | null;
   onChange?: (value: number) => void;
   handleClassName?: string;
   trackClassName?: string;
@@ -26,18 +24,26 @@ export type SliderProps = Omit<
 };
 
 const Slider = forwardRef<RangeRef, SliderProps>(
-  ({ value, defaultValue, onChange, ...props }: SliderProps, ref) => (
-    <Range
-      ref={ref}
-      range={false}
-      value={value === undefined ? undefined : value === null ? null : [value]}
-      defaultValue={defaultValue === undefined ? undefined : [defaultValue]}
-      onChange={
-        onChange === undefined ? undefined : ([newValue]) => onChange(newValue)
-      }
-      {...props}
-    />
-  )
+  ({ value, onChange, ...props }: SliderProps, ref) => {
+    const valueArray = useMemo(
+      () => (value === null ? null : [value]),
+      [value]
+    );
+
+    return (
+      <Range
+        ref={ref}
+        range={false}
+        value={valueArray}
+        onChange={
+          onChange === undefined
+            ? undefined
+            : ([newValue]) => onChange(newValue)
+        }
+        {...props}
+      />
+    );
+  }
 );
 
 export default Slider;

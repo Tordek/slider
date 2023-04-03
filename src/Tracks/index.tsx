@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import SliderContext from '../context';
 import Track from './Track';
 import { OnStartMove } from '../interface';
@@ -17,9 +17,9 @@ export default function Tracks({
   startPoint,
   onStartMove,
 }: TrackProps) {
-  const { range } = React.useContext(SliderContext);
+  const { range } = useContext(SliderContext);
 
-  const trackList = React.useMemo(() => {
+  const trackList = useMemo(() => {
     if (range) {
       // Multiple
       const list = [];

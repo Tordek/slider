@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import clsx from 'clsx';
 import warning from 'tiny-warning';
 import shallowEqual from 'shallowequal';
@@ -24,6 +24,7 @@ export interface RangeProps {
   range?: boolean;
 
   // Status
+  readOnly?: boolean;
   disabled?: boolean;
   autoFocus?: boolean;
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
@@ -47,10 +48,7 @@ export interface RangeProps {
   step?: number | null;
 
   /** Selected values of handles, when using it as a controlled component */
-  value?: number[] | null;
-
-  /** Selected initial value, when using it as an uncontrolled component */
-  defaultValue?: number[];
+  value: number[] | null;
 
   /** Called whenever a handle is moved */
   onChange?: (value: number[]) => void;
@@ -154,7 +152,7 @@ export interface RangeProps {
 
   // Components
   /** Custom renderer for handles */
-  handleRender?: HandlesProps['handleRender'];
+  handleRender?: HandlesProps['handleRenderer'];
 
   // Accessibility
   /** tabIndex for each handle. Set to `null` to disable. */
@@ -175,10 +173,11 @@ export interface RangeRef {
   blur: () => void;
 }
 
-const Slider = React.forwardRef<RangeRef, RangeProps>(
+const Range = React.forwardRef<RangeRef, RangeProps>(
   (
     {
       // Status
+      readOnly = false,
       disabled = false,
       autoFocus = false,
       onFocus,
@@ -189,7 +188,6 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
       max = 100,
       step = 1,
       value,
-      defaultValue,
       range = true,
       count,
       onChange,
@@ -238,8 +236,8 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     },
     ref
   ) => {
-    const handlesRef = React.useRef<HandlesRef>(null);
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const handlesRef = useRef<HandlesRef>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const direction = vertical
       ? reverse
         ? 'ttb'
@@ -249,7 +247,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
       : 'ltr';
 
     const boundedMin = isFinite(min) ? min : 0;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         isFinite(min),
         `Invalid \`min\` value: ${min}. It must be a finite number.`
@@ -257,7 +255,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     }, [min]);
 
     const boundedMax = isFinite(max) ? max : 100;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         isFinite(max),
         `Invalid \`max\` value: ${max}. It must be a finite number.`
@@ -266,19 +264,32 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
 
     // ============================= Step =============================
     const normalizedStep = step === null || step > 0 ? step : 1;
-    React.useEffect(() => {
+    useEffect(() => {
       warning(
         !(step && step < 0),
-        `Invalid \`step\` value: ${step}. \`step\` cannot be negative.`
+        `Invalid \`step\` value: ${
+          step ?? '`null`'
+        }. \`step\` cannot be negative.`
       );
     }, [step]);
 
+    useEffect(() => {
+      warning(
+        readOnly || onChange !== undefined,
+        'You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. Set either `onChange` or `readOnly`.'
+      );
+    }, [readOnly, onChange]);
+
     // ============================= Push =============================
     const mergedPush =
-      pushable === true ? normalizedStep : pushable >= 0 ? pushable : false;
+      pushable === true
+        ? normalizedStep
+        : pushable && pushable >= 0
+        ? pushable
+        : false;
 
     // ============================ Marks =============================
-    const markList = React.useMemo<InternalMarkObj[]>(() => {
+    const markList = useMemo<InternalMarkObj[]>(() => {
       return Object.entries(marks ?? {})
         .map(([key, mark]) => ({
           value: Number(key),
@@ -299,22 +310,18 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     );
 
     // ============================ Values ============================
-    const [localValue, setValue] = useState(defaultValue);
-    const mergedValue = value === undefined ? localValue : value;
-
-    const rawValues = React.useMemo(() => {
-      const valueList =
-        mergedValue === null || mergedValue === undefined ? [] : mergedValue;
+    const rawValues = useMemo(() => {
+      const valueList = value ?? [];
 
       const [val0 = boundedMin] = valueList;
-      let returnValues = mergedValue === null ? [] : [val0];
+      let returnValues = value === null ? [] : [val0];
 
       // Format as range
       if (range) {
         returnValues = [...valueList];
 
         // When count provided or value is `undefined`, we fill values
-        if (count || mergedValue === undefined) {
+        if (count || value === undefined) {
           const pointCount = count && count >= 0 ? count + 1 : 2;
           returnValues = returnValues.slice(0, pointCount);
 
@@ -334,7 +341,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
       });
 
       return returnValues;
-    }, [mergedValue, range, boundedMin, count, constrainValue]);
+    }, [value, range, boundedMin, count, constrainValue]);
 
     // =========================== onChange ===========================
 
@@ -345,9 +352,6 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
       // Trigger event if needed
       if (!shallowEqual(cloneNextValues, rawValues)) {
         onChange?.(cloneNextValues);
-
-        // We set this later since it will re-render component immediately
-        setValue(cloneNextValues);
       }
     };
 
@@ -430,7 +434,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
 
     // ============================= Drag =============================
     const mergedDraggableTrack = draggableTrack && normalizedStep !== null;
-    React.useEffect(() => {
+    useEffect(() => {
       if (draggableTrack && normalizedStep === null) {
         console.warn(
           '`draggableTrack` is not supported when `step` is `null`.'
@@ -451,14 +455,14 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     });
 
     // =========================== Included ===========================
-    const sortedCacheValues = React.useMemo(
+    const sortedCacheValues = useMemo(
       () => [...rawValues].sort((a, b) => a - b),
       [rawValues]
     );
 
     // Provide a range values with included [min, max]
     // Used for Track, Mark & Dot
-    const [includedStart, includedEnd] = React.useMemo(() => {
+    const [includedStart, includedEnd] = useMemo(() => {
       if (!range) {
         return [boundedMin, sortedCacheValues[0]];
       }
@@ -470,7 +474,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     }, [sortedCacheValues, range, boundedMin]);
 
     // ============================= Refs =============================
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       focus: () => {
         handlesRef.current?.focus(0);
       },
@@ -483,7 +487,7 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
     }));
 
     // ========================== Auto Focus ==========================
-    React.useEffect(() => {
+    useEffect(() => {
       if (autoFocus) {
         handlesRef.current?.focus(0);
       }
@@ -529,13 +533,14 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
             />
           )}
 
-          <Steps
-            marks={markList}
-            dots={dots}
-            className={stepsClassName}
-            dotClassName={dotClassName}
-            activeClassName={activeDotClassName}
-          />
+          {dots && (
+            <Steps
+              marks={markList}
+              className={stepsClassName}
+              dotClassName={dotClassName}
+              activeClassName={activeDotClassName}
+            />
+          )}
 
           <Handles
             ref={handlesRef}
@@ -547,20 +552,22 @@ const Slider = React.forwardRef<RangeRef, RangeProps>(
             onOffsetChange={onHandleOffsetChange}
             onFocus={onFocus}
             onBlur={onBlur}
-            handleRender={handleRender}
+            handleRenderer={handleRender}
           />
 
-          <Marks
-            className={marksClassName}
-            markClassName={markTextClassName}
-            activeMarkClassName={activeMarkTextClassName}
-            marks={markList}
-            onClick={setClosestHandle}
-          />
+          {markList.length > 0 && (
+            <Marks
+              className={marksClassName}
+              markClassName={markTextClassName}
+              activeMarkClassName={activeMarkTextClassName}
+              marks={markList}
+              onClick={setClosestHandle}
+            />
+          )}
         </div>
       </SliderContext.Provider>
     );
   }
 );
 
-export default Slider;
+export default Range;

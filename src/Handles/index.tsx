@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import Handle from './Handle';
 import { HandleProps } from './Handle';
 import { getIndex } from '../util';
@@ -12,8 +12,8 @@ export interface HandlesProps {
   onOffsetChange: (value: number | 'min' | 'max', valueIndex: number) => void;
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
-  handleRender?: HandleProps['render'];
-  draggingIndex: number;
+  handleRenderer?: HandleProps['handleRenderer'];
+  draggingIndex: number | null;
 }
 
 export interface HandlesRef {
@@ -21,29 +21,17 @@ export interface HandlesRef {
 }
 
 const Handles = React.forwardRef<HandlesRef, HandlesProps>(
-  (
-    {
-      handleClassName,
-      draggingClassName,
-      onStartMove,
-      onOffsetChange,
-      values,
-      handleRender,
-      draggingIndex,
-      ...restProps
-    },
-    ref
-  ) => {
-    const handlesRef = React.useRef<Record<number, HTMLDivElement>>({});
+  ({ handleClassName, values, draggingIndex, ...restProps }, ref) => {
+    const handlesRef = useRef<Record<number, HTMLDivElement>>({});
 
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       focus: (index: number) => {
         handlesRef.current[index]?.focus();
       },
     }));
 
     return (
-      <React.Fragment>
+      <>
         {values.map((value, index) => (
           <Handle
             ref={(node) => {
@@ -55,17 +43,13 @@ const Handles = React.forwardRef<HandlesRef, HandlesProps>(
             }}
             dragging={draggingIndex === index}
             className={getIndex(handleClassName, index)}
-            draggingClassName={draggingClassName}
             key={`${index}+${value}`}
             value={value}
             valueIndex={index}
-            onStartMove={onStartMove}
-            onOffsetChange={onOffsetChange}
-            render={handleRender}
             {...restProps}
           />
         ))}
-      </React.Fragment>
+      </>
     );
   }
 );

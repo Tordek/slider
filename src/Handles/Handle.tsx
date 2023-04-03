@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import SliderContext from '../context';
-import { getPositionStyle, getIndex } from '../util';
+import { getPositionStyle, getIndex, getOffset } from '../util';
 import { OnStartMove } from '../interface';
 
 interface RenderProps {
@@ -20,7 +20,7 @@ export interface HandleProps {
   onOffsetChange: (offset: number | 'min' | 'max', valueIndex: number) => void;
   onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
-  render?: (
+  handleRenderer?: (
     origin: React.ReactElement<HandleProps>,
     props: RenderProps
   ) => React.ReactElement;
@@ -34,7 +34,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
       value,
       valueIndex,
       onStartMove,
-      render,
+      handleRenderer,
       dragging,
       onOffsetChange,
       ...restProps
@@ -50,7 +50,7 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
       ariaLabelForHandle,
       ariaLabelledByForHandle,
       ariaValueTextFormatterForHandle,
-    } = React.useContext(SliderContext);
+    } = useContext(SliderContext);
 
     // ============================ Events ============================
     const onInternalStartMove = (e: React.MouseEvent | React.TouchEvent) => {
@@ -108,10 +108,13 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
     };
 
     // ============================ Offset ============================
-    const positionStyle = getPositionStyle(direction, value, min, max);
+    const positionStyle = getPositionStyle(
+      direction,
+      getOffset(value, min, max)
+    );
 
     // ============================ Render ============================
-    let handleNode = (
+    const handleNode = (
       <div
         ref={ref}
         className={clsx(className, dragging && draggingClassName)}
@@ -138,8 +141,8 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
     );
 
     // Customize
-    if (render) {
-      handleNode = render(handleNode, {
+    if (handleRenderer) {
+      return handleRenderer(handleNode, {
         index: valueIndex,
         value,
         dragging,
