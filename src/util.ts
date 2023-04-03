@@ -4,39 +4,32 @@ export function getOffset(value: number, min: number, max: number) {
   return (value - min) / (max - min);
 }
 
-export function getPositionStyle(
-  direction: Direction,
-  value: number,
-  min: number,
-  max: number
-) {
-  const offset = getOffset(value, min, max);
-
-  const positionStyle: React.CSSProperties = {};
-
+export function getPositionStyle(direction: Direction, offset: number) {
   switch (direction) {
     case 'rtl':
-      positionStyle.right = `${offset * 100}%`;
-      positionStyle.transform = 'translateX(50%)';
-      break;
+      return {
+        right: `${offset * 100}%`,
+        transform: 'translateX(50%)',
+      };
 
     case 'btt':
-      positionStyle.bottom = `${offset * 100}%`;
-      positionStyle.transform = 'translateY(50%)';
-      break;
+      return {
+        bottom: `${offset * 100}%`,
+        transform: 'translateY(50%)',
+      };
 
     case 'ttb':
-      positionStyle.top = `${offset * 100}%`;
-      positionStyle.transform = 'translateY(-50%)';
-      break;
+      return {
+        top: `${offset * 100}%`,
+        transform: 'translateY(-50%)',
+      };
 
     default:
-      positionStyle.left = `${offset * 100}%`;
-      positionStyle.transform = 'translateX(-50%)';
-      break;
+      return {
+        left: `${offset * 100}%`,
+        transform: 'translateX(-50%)',
+      };
   }
-
-  return positionStyle;
 }
 
 /** Return index value if is list or return value directly */

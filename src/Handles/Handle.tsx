@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import SliderContext from '../context';
-import { getPositionStyle, getIndex } from '../util';
+import { getPositionStyle, getIndex, getOffset } from '../util';
 import { OnStartMove } from '../interface';
 
 interface RenderProps {
@@ -108,7 +108,10 @@ const Handle = React.forwardRef<HTMLDivElement, HandleProps>(
     };
 
     // ============================ Offset ============================
-    const positionStyle = getPositionStyle(direction, value, min, max);
+    const positionStyle = getPositionStyle(
+      direction,
+      getOffset(value, min, max)
+    );
 
     // ============================ Render ============================
     let handleNode = (
